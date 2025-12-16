@@ -1,5 +1,5 @@
 @echo off
-REM Femas Check-out Batch Wrapper for Windows
+REM FemasHR Check-out Batch Wrapper for Windows
 REM This calls the bash script using Git Bash
 
 SET SCRIPT_DIR=%~dp0

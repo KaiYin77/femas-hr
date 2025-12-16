@@ -46,9 +46,9 @@ if [ $? -ne 0 ]; then
 fi
 
 # ---- random delay (0–20 minutes) ----
-DELAY=$(( RANDOM % 1200 ))
-# DELAY=0
-echo "$(date) | 🟢 Sleeping ${DELAY}s before check-out"
+# DELAY=$(( RANDOM % 1200 ))
+DELAY=0
+echo "$(date) | 🔴 Sleeping ${DELAY}s before check-out"
 sleep "$DELAY"
 
 # ---- clean old cookie ----
