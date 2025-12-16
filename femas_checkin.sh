@@ -61,6 +61,22 @@ curl -s -L -c "$COOKIE" \
   -H "Referer: $LOGIN_URL" \
   --data "data[Account][username]=$FEMAS_USER&data[Account][passwd]=$FEMAS_PASS&data[remember]=1" > /dev/null
 
+# ---- extract user_id from main page ----
+echo "$(date) | 🟢 Fetching user ID"
+MAIN_PAGE_RESPONSE=$(curl -s -b "$COOKIE" "$MAIN_URL")
+
+# Extract user_id from hidden input field
+USER_ID=$(echo "$MAIN_PAGE_RESPONSE" | grep -o 'ClockRecord\]\[user_id\]" value="[0-9]*"' | grep -o '[0-9]*' | head -1)
+
+if [ -z "$USER_ID" ]; then
+  echo "$(date) | ❌ ERROR: Could not extract user_id from main page"
+  echo "$(date) | 💡 Please run: bash inspect_user_id.sh"
+  rm -f "$COOKIE"
+  exit 1
+fi
+
+echo "$(date) | 🟢 User ID: $USER_ID"
+
 # ---- step 1: clock listing ----
 echo "$(date) | 🟢 Step 1: Clock listing"
 curl -s -b "$COOKIE" \
@@ -68,7 +84,7 @@ curl -s -b "$COOKIE" \
   -H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" \
   -H "X-Requested-With: XMLHttpRequest" \
   -H "Referer: $MAIN_URL" \
-  --data "_method=POST&data[ClockRecord][user_id]=26&data[AttRecord][user_id]=26&data[ClockRecord][shift_id]=&data[ClockRecord][period]=1&data[ClockRecord][clock_type]=S&data[ClockRecord][latitude]=&data[ClockRecord][longitude]=" > /dev/null
+  --data "_method=POST&data[ClockRecord][user_id]=$USER_ID&data[AttRecord][user_id]=$USER_ID&data[ClockRecord][shift_id]=&data[ClockRecord][period]=1&data[ClockRecord][clock_type]=S&data[ClockRecord][latitude]=&data[ClockRecord][longitude]=" > /dev/null
 
 # ---- step 2: revision save ----
 echo "$(date) | 🟢 Step 2: Revision save"
