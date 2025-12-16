@@ -1,0 +1,22 @@
+# Credentials and sensitive files
+.env
+
+# Log files
+*.log
+
+# Temporary files
+*.tmp
+*.cookies
+/tmp/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
