@@ -25,7 +25,7 @@ if %errorLevel% neq 0 (
 SET SCRIPT_DIR=%~dp0
 SET ENV_FILE=%SCRIPT_DIR%.env
 
-echo [Step 1/5] Configure Femas Credentials
+echo [Step 1/8] Configure Femas Credentials
 echo ========================================
 echo.
 
@@ -46,7 +46,7 @@ if "%FEMAS_PASS%"=="" (
 )
 
 echo.
-echo [Step 2/5] Configure Check-in/out Times
+echo [Step 2/8] Configure Check-in/out Times
 echo ========================================
 echo.
 
@@ -63,7 +63,7 @@ echo Check-out time set to: %CHECKOUT_TIME%
 echo.
 
 REM ---- Create .env file ----
-echo [Step 3/5] Creating configuration file (.env)
+echo [Step 3/8] Creating configuration file (.env)
 echo ========================================
 echo.
 
@@ -85,7 +85,81 @@ if exist "%ENV_FILE%" (
 )
 
 echo.
-echo [Step 4/5] Registering check-in task to Task Scheduler
+echo [Step 4/8] Creating holidays configuration file
+echo ========================================
+echo.
+
+SET HOLIDAYS_FILE=%SCRIPT_DIR%holidays
+SET HOLIDAYS_EXAMPLE=%SCRIPT_DIR%holidays.example
+
+REM ---- Copy holidays.example to holidays if it doesn't exist ----
+if not exist "%HOLIDAYS_FILE%" (
+    if exist "%HOLIDAYS_EXAMPLE%" (
+        copy "%HOLIDAYS_EXAMPLE%" "%HOLIDAYS_FILE%" >nul
+        echo [SUCCESS] holidays file created from holidays.example
+        echo.
+        echo You can customize the holidays file to add or remove holidays.
+        echo The file supports:
+        echo   - Single dates: 2025-01-01
+        echo   - Date ranges:  2025-01-01~2025-01-04
+        echo.
+    ) else (
+        echo [WARNING] holidays.example not found, skipping holidays configuration
+        echo Holiday checking will only work for weekends
+    )
+) else (
+    echo [INFO] holidays file already exists, keeping your existing configuration
+)
+
+echo.
+echo [Step 5/8] Running essential tests
+echo ========================================
+echo.
+
+REM ---- Test 1: Check bash installation ----
+echo [Test 1/2] Checking bash installation...
+where bash >nul 2>&1
+if %ERRORLEVEL% EQU 0 (
+    echo [PASS] Bash is available
+    if exist "%SCRIPT_DIR%test_bash.sh" (
+        bash "%SCRIPT_DIR%test_bash.sh"
+        if %ERRORLEVEL% NEQ 0 (
+            echo [WARNING] Bash test failed, but continuing...
+        )
+    )
+) else (
+    echo [FAIL] Bash not found! Please install Git for Windows or WSL.
+    echo       Download Git: https://git-scm.com/download/win
+    pause
+    exit /b 1
+)
+echo.
+
+REM ---- Test 2: Instant checkout sanity test ----
+echo [Test 2/2] Testing checkout script (instant, no delay)...
+echo.
+
+if exist "%SCRIPT_DIR%test_instant_checkout.sh" (
+    bash "%SCRIPT_DIR%test_instant_checkout.sh"
+    set CHECKOUT_RESULT=%ERRORLEVEL%
+) else (
+    echo [WARNING] test_instant_checkout.sh not found, skipping test
+    set CHECKOUT_RESULT=0
+)
+
+if %CHECKOUT_RESULT% NEQ 0 (
+    echo.
+    set /p CONTINUE="Continue with installation? (Y/N): "
+    if /i not "%CONTINUE%"=="Y" (
+        echo Installation cancelled by user.
+        pause
+        exit /b 1
+    )
+)
+echo.
+
+echo.
+echo [Step 6/8] Registering check-in task to Task Scheduler
 echo ========================================
 echo.
 
@@ -101,7 +175,7 @@ if %ERRORLEVEL% EQU 0 (
 )
 
 echo.
-echo [Step 5/5] Registering check-out task to Task Scheduler
+echo [Step 7/8] Registering check-out task to Task Scheduler
 echo ========================================
 echo.
 
@@ -116,6 +190,9 @@ if %ERRORLEVEL% EQU 0 (
     echo [ERROR] Check-out task registration failed
 )
 
+echo.
+echo [Step 8/8] Installation Complete!
+echo ========================================
 echo.
 echo ========================================
 echo     Installation Complete!

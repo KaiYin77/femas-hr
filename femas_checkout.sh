@@ -46,10 +46,14 @@ if [ $? -ne 0 ]; then
 fi
 
 # ---- random delay (0–20 minutes) ----
-DELAY=$(( RANDOM % 1200 ))
-# DELAY=0
-echo "$(date) | 🔴 Sleeping ${DELAY}s before check-out"
-sleep "$DELAY"
+if [ "$SKIP_DELAY" = "1" ] || [ "$SKIP_DELAY" = "true" ]; then
+  DELAY=0
+  echo "$(date) | 🟢 Skipping delay (SKIP_DELAY enabled)"
+else
+  DELAY=$(( RANDOM % 1200 ))
+  echo "$(date) | 🔴 Sleeping ${DELAY}s before check-out"
+  sleep "$DELAY"
+fi
 
 # ---- clean old cookie ----
 rm -f "$COOKIE"

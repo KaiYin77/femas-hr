@@ -19,25 +19,25 @@ echo [%date% %time%] Starting Femas check-out... >> "%LOG_FILE%"
 REM Try to find bash in PATH first
 where bash >nul 2>&1
 if %ERRORLEVEL% EQU 0 (
-    bash "%SCRIPT_DIR%femas_checkout.sh"
+    bash -c "SKIP_DELAY=%SKIP_DELAY% '%SCRIPT_DIR%femas_checkout.sh'"
     goto :check_result
 )
 
 REM Check Git Bash in common locations
 if exist "C:\Program Files\Git\bin\bash.exe" (
-    "C:\Program Files\Git\bin\bash.exe" "%SCRIPT_DIR%femas_checkout.sh"
+    "C:\Program Files\Git\bin\bash.exe" -c "SKIP_DELAY=%SKIP_DELAY% '%SCRIPT_DIR%femas_checkout.sh'"
     goto :check_result
 )
 
 if exist "C:\Program Files (x86)\Git\bin\bash.exe" (
-    "C:\Program Files (x86)\Git\bin\bash.exe" "%SCRIPT_DIR%femas_checkout.sh"
+    "C:\Program Files (x86)\Git\bin\bash.exe" -c "SKIP_DELAY=%SKIP_DELAY% '%SCRIPT_DIR%femas_checkout.sh'"
     goto :check_result
 )
 
 REM Check WSL
 where wsl >nul 2>&1
 if %ERRORLEVEL% EQU 0 (
-    wsl bash "%SCRIPT_DIR%femas_checkout.sh"
+    wsl bash -c "SKIP_DELAY=%SKIP_DELAY% '%SCRIPT_DIR%femas_checkout.sh'"
     goto :check_result
 )
 
