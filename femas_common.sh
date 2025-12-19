@@ -51,7 +51,7 @@ random_delay() {
 
 	local delay_seconds=0
 	if [ "$SKIP_DELAY" != "1" ] && [ "$SKIP_DELAY" != "true" ]; then
-		delay_seconds=$(( $(shuf -i 0-99999 -n 1) % 1200 ))
+		delay_seconds=$(( $(shuf -i 0-99999 -n 1) % 300 ))
 	fi
 	echo "$(date) | $color_icon Sleeping ${delay_seconds}s before $action"
 	sleep "$delay_seconds"
