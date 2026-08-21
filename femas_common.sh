@@ -37,8 +37,11 @@ load_env() {
 # Expects SCRIPT_DIR to be set.
 check_holiday() {
 	local action=$1
-	# Use relative path to avoid Windows path issues
-	bash "${SCRIPT_DIR}/check_holiday.sh"
+	# Use $BASH (absolute path of the current interpreter) instead of bare
+	# "bash", which under Task Scheduler's PATH can resolve to a different
+	# bash.exe (e.g. the WSL launcher stub) and fail, causing a false
+	# "holiday detected" skip that still exits 0.
+	"$BASH" "${SCRIPT_DIR}/check_holiday.sh"
 	if [ $? -ne 0 ]; then
 		echo "$(date) | 🟡 Holiday detected, skipping $action"
 		exit 0
